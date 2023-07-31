@@ -1,0 +1,198 @@
+﻿@page "/"
+@using KittyWorks.Coop.Web.Data
+@using KittyWorks.Coop.Web.Domain
+@using Microsoft.EntityFrameworkCore
+@inject CoopDbContext _db
+@inject ApplicationContext _context
+
+<PageTitle>Index</PageTitle>
+
+<div class="row">
+    <div class="col-6">
+        <h3>Campaigns</h3>
+        <ul>
+            @foreach (var campaign in _db.Campaigns
+            .Include(c => c.CampaignProducts).ThenInclude(cp => cp.Product)
+            .Include(c => c.CampaignProducts).ThenInclude(cp => cp.CampaignProductLocations).ThenInclude(cpl => cpl.Location))
+            {
+                <li>
+                    @campaign.Name
+                    <small>(@campaign.ExternalId)</small>
+                    <i class="bi bi-trash-fill text-danger" style="cursor:pointer" @onclick="() => DeleteCampaign(campaign.Id)"></i>
+                    <ul>
+                        @foreach (var campaignProduct in campaign.CampaignProducts)
+                        {
+                            <li>
+                                @campaignProduct.Product.Sku
+                                <small>(@campaignProduct.Offer€)</small>
+                                <i class="bi bi-trash-fill text-danger" style="cursor:pointer" @onclick="() => DeleteCampaignProduct(campaignProduct.Id)"></i>
+                                <ul>
+                                    @foreach (var campaignProductLocation in campaignProduct.CampaignProductLocations)
+                                    {
+                                        <li>
+                                            @campaignProductLocation.Location.Gln
+                                            <i class="bi bi-trash-fill text-danger" style="cursor:pointer" @onclick="() => DeleteCampaignProductLocation(campaignProductLocation.Id)"></i>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="col-6">
+
+        <h3>Products</h3>
+        <ul>
+            @foreach (var product in _db.Products)
+            {
+                <li>
+                    @product.Sku
+                    <i class="bi bi-trash-fill text-danger" style="cursor:pointer" @onclick="() => DeleteProduct(product.Id)"></i>
+                </li>
+            }
+        </ul>
+
+        <div class="input-group">
+            <button class="btn btn-outline-secondary" type="button" @onclick="() => AddProduct()">Add</button>
+            <input type="text" class="form-control" placeholder="product name" @bind="_sku" />
+        </div>
+
+        <br />
+
+        <h3>Locations</h3>
+        <ul>
+            @foreach (var location in _db.Locations)
+            {
+                <li>
+                    @location.Gln
+                    <i class="bi bi-trash-fill text-danger" style="cursor:pointer" @onclick="() => DeleteLocation(location.Id)"></i>
+                </li>
+            }
+        </ul>
+
+        <div class="input-group">
+            <button class="btn btn-outline-secondary" type="button" @onclick="() => AddLocation()">Add</button>
+            <input type="text" class="form-control" placeholder="location name" @bind="_gln" />
+        </div>
+
+    </div>
+</div>
+
+<h3>Add Campaign</h3>
+<form class="row g-3" @onsubmit="() => AddCampaign()">
+    <div class="col-md-6">
+        <label for="form-campaign-name" class="form-label">Campaign name</label>
+        <input id="form-campaign-name" class="form-control" type="text" @bind="_campaignName" required/>
+    </div>
+    <div class="col-md-6">
+        <label for="form-campaign-id" class="form-label">Campaign id</label>
+        <input id="form-campaign-id" class="form-control" type="text" @bind="_campaignExternalId" required />
+    </div>
+    <div class="col-12">
+        <label for="form-campaign-offer" class="form-label">Offer</label>
+        <input id="form-campaign-offer" class="form-control" type="number" @bind="_offer" placeholder="offer" required />
+    </div>
+    <div class="col-md-6">
+        <label id="form-product" class="form-label">Product</label>
+        <select id="form-product" class="form-select" @bind="_selectedProductId" required>
+            <option selected value="">-- Select product --</option>
+            @foreach (var product in _db.Products)
+            {
+                <option value="@product.Id">@product.Sku</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label for="form-location" class="form-label">Location</label>
+        <select id="form-location" class="form-select" @bind="_selectedLocationId" required>
+            <option selected value="">-- Select location --</option>
+            @foreach (var location in _db.Locations)
+            {
+                <option value="@location.Id">@location.Gln</option>
+            }
+        </select>
+    </div>
+    <div class="col-12">
+        <button class="btn btn-primary" type="submit">Add</button>
+    </div>
+</form>
+
+@code {
+    string _campaignName = string.Empty;
+    string _campaignExternalId = string.Empty;
+    decimal? _offer = null;
+    Guid? _selectedProductId = null;
+    Guid? _selectedLocationId = null;
+    string _gln = string.Empty;
+    string _sku = string.Empty;    
+
+    void AddCampaign()
+    {
+        if (!string.IsNullOrWhiteSpace(_campaignName)
+            && !string.IsNullOrWhiteSpace(_campaignExternalId)
+            && _offer.HasValue
+            && _selectedProductId.HasValue && _selectedLocationId.HasValue)
+        {
+            CampaignModule.AddCampaign(_context, new()
+            {
+                ExternalId = _campaignExternalId,
+                LocationId = _selectedLocationId.Value,
+                Name = _campaignName,
+                Offer = _offer.Value,
+                ProductId = _selectedProductId.Value
+            });
+
+            _campaignName = string.Empty;
+            _campaignExternalId = string.Empty;
+            _offer = null;
+            _selectedLocationId = null;
+            _selectedProductId = null;
+        }
+    }
+
+    void DeleteCampaign(Guid campaignId)
+    {
+        CampaignModule.DeleteCampaign(_context, campaignId);
+    }
+
+    void DeleteCampaignProduct(Guid campaignProductId)
+    {
+        CampaignModule.DeleteCampaignProduct(_context, campaignProductId);
+    }
+
+    void DeleteCampaignProductLocation(Guid campaignProductLocationId)
+    {
+        CampaignModule.DeleteCampaignProductLocation(_context, campaignProductLocationId);
+    }
+
+    void AddLocation()
+    {
+        if (!string.IsNullOrWhiteSpace(_gln))
+        {
+            LocationModule.AddLocation(_context, _gln);
+            _gln = string.Empty;
+        }
+    }
+
+    void DeleteLocation(Guid locationId)
+    {
+        CampaignModule.DeleteLocationsWithRelatedCampaignProductLocations(_context, locationId);
+    }
+
+    void AddProduct()
+    {
+        if (!string.IsNullOrWhiteSpace(_sku))
+        {
+            ProductModule.AddProduct(_context, _sku);
+            _sku = string.Empty;
+        }
+    }
+
+    void DeleteProduct(Guid productId)
+    {
+        CampaignModule.DeleteProductWithRelatedCampaignProducts(_context, productId);
+    }
+}
