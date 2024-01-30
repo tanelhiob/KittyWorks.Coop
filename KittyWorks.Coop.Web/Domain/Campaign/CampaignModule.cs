@@ -47,7 +47,7 @@ public static partial class CampaignModule
         context.Commit();
     }
 
-    public static Campaign CreateCampaignFromDto(ICreateCampaignFromDtoContext context, CampaignDto dto)
+    private static Campaign CreateCampaignFromDto(ICreateCampaignFromDtoContext context, CampaignDto dto)
     {
         var campaign = new Campaign
         {
@@ -59,7 +59,7 @@ public static partial class CampaignModule
         return campaign;
     }
 
-    public static CampaignProduct CreateCampaignProductFromDto(ICreateCampaignProductFromDtoContext context, Guid campaignId, CampaignDto dto)
+    private static CampaignProduct CreateCampaignProductFromDto(ICreateCampaignProductFromDtoContext context, Guid campaignId, CampaignDto dto)
     {
         var campaignProduct = new CampaignProduct
         {
@@ -72,7 +72,7 @@ public static partial class CampaignModule
         return campaignProduct;
     }
 
-    public static CampaignProductLocation CreateCampaignProductLocationFromDto(ICreateCampaignProductLocationFromDtoContext context, Guid campaignProductId, CampaignDto dto)
+    private static CampaignProductLocation CreateCampaignProductLocationFromDto(ICreateCampaignProductLocationFromDtoContext context, Guid campaignProductId, CampaignDto dto)
     {
         var campaignProductLocation = new CampaignProductLocation
         {
