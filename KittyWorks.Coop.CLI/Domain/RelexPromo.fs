@@ -82,7 +82,7 @@ type IImportCampaignsContext =
 let importCampaigns (context: #IImportCampaignsContext) =
     let existingCampaigns = context.getExistingSortedCampaigns ()
     let importedCampaigns = context.getImportedSortedCampaigns ()
-    let changes = compare existingCampaigns importedCampaigns compareCampaignDtos
+    let changes = compareSequences existingCampaigns importedCampaigns compareCampaignDtos
 
     for change in changes do
         match change with
@@ -92,6 +92,19 @@ let importCampaigns (context: #IImportCampaignsContext) =
 
     cleanup context
 
-let getImportedSortedCampaigns (): CampaignDto seq = 
-    
+let getImportedSortedCampaigns (): CampaignDto seq =     
     Seq.empty
+
+type FooEnv = {
+    add: int -> int -> int
+    divide: int -> int -> float
+}
+
+let bar env arg1 arg2 =
+    let a = env.divide arg1 arg2
+    a
+
+let foo env arg1 arg2 =
+    let a = env.add arg1 arg2
+    let b = bar env a arg1
+    b

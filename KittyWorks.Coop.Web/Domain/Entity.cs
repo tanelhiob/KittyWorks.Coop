@@ -1,6 +1,6 @@
 ﻿namespace KittyWorks.Coop.Web.Domain;
 
-public abstract class Entity
+public abstract record Entity
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
 }

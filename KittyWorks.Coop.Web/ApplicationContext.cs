@@ -1,5 +1,7 @@
 ﻿using KittyWorks.Coop.Web.Data;
-using KittyWorks.Coop.Web.Domain;
+using KittyWorks.Coop.Web.Domain.Campaign;
+using KittyWorks.Coop.Web.Domain.Location;
+using KittyWorks.Coop.Web.Domain.Product;
 using Microsoft.EntityFrameworkCore;
 
 namespace KittyWorks.Coop.Web;
@@ -37,8 +39,8 @@ public record ApplicationContext
                 .First(x => x.Id == campaignProductLocationId);
             return (campaignProductLocation, campaignProductLocation.CampaignProduct, campaignProductLocation.CampaignProduct.Campaign);
         };
-        DeleteCampaignIfNoCampaignProducts = campaignId => db.RemoveRange(db.Campaigns.Where(x => x.Id == campaignId && !x.CampaignProducts.Any()));        
-        DeleteCampaignProductIfNoCampaignProductLocations = campaignProductId => db.RemoveRange(db.CampaignProducts.Where(x => x.Id == campaignProductId && !x.CampaignProductLocations.Any()));
+        DeleteCampaignIfNoCampaignProducts = campaignId => db.RemoveRange(db.Campaigns.Where(x => x.Id == campaignId && x.CampaignProducts.Count == 0));
+        DeleteCampaignProductIfNoCampaignProductLocations = campaignProductId => db.RemoveRange(db.CampaignProducts.Where(x => x.Id == campaignProductId && x.CampaignProductLocations.Count == 0));
         DeleteCampaignProductLocation = campaignProductLocationId => db.RemoveRange(db.CampaignProductLocations.Where(x => x.Id == campaignProductLocationId));
         DeleteCampaignProductWithCampaignProductLocations = campaignProductId =>
         {
@@ -57,7 +59,7 @@ public record ApplicationContext
             db.RemoveRange(db.CampaignProductLocations.Where(x => x.CampaignProduct.ProductId == productId));
             db.RemoveRange(db.CampaignProducts.Where(x => x.ProductId == productId));
         };
-        DeleteCampaignsIfNoCampaignProductsByIds = campaignIds => db.RemoveRange(db.Campaigns.Where(x => campaignIds.Contains(x.Id) && !x.CampaignProducts.Any()));
+        DeleteCampaignsIfNoCampaignProductsByIds = campaignIds => db.RemoveRange(db.Campaigns.Where(x => campaignIds.Contains(x.Id) && x.CampaignProducts.Count == 0));
         DeleteProductById = productId => db.RemoveRange(db.Products.Where(x => x.Id == productId));
         DeleteCampaignProductLocationsByLocationId = locationId => db.RemoveRange(db.CampaignProductLocations.Where(x => x.LocationId == locationId));
         GetCampaignProductIdsWithCampaignIdsByLocationId = locationId => db.CampaignProductLocations
@@ -66,10 +68,11 @@ public record ApplicationContext
             .ToList()
             .Select(x => (x.CampaignProductId, x.CampaignId))
             .ToList();
-        DeleteCampaignProductsIfNoCampaignProductLocationsByIds = productIds => db.RemoveRange(db.CampaignProducts.Where(x => productIds.Contains(x.Id) && !x.CampaignProductLocations.Any()));
+        DeleteCampaignProductsIfNoCampaignProductLocationsByIds = productIds => db.RemoveRange(db.CampaignProducts.Where(x => productIds.Contains(x.Id) && x.CampaignProductLocations.Count == 0));
         DeleteLocationById = locationId => db.RemoveRange(db.Locations.Where(x => x.Id == locationId));
         AddLocation = location => db.Locations.Add(location);
-        AddProduct = product => db.Products.Add(product);
+
+        AddProduct = (Product product) => db.Products.Add(product);
     }
 
     public Action Commit { get; }

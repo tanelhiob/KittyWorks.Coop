@@ -1,4 +1,6 @@
-﻿using KittyWorks.Coop.Web.Domain;
+﻿using KittyWorks.Coop.Web.Domain.Campaign;
+using KittyWorks.Coop.Web.Domain.Location;
+using KittyWorks.Coop.Web.Domain.Product;
 using Microsoft.EntityFrameworkCore;
 
 namespace KittyWorks.Coop.Web.Data;
@@ -12,7 +14,7 @@ public class CoopDbContext : DbContext
     public DbSet<CampaignProductLocation> CampaignProductLocations => Set<CampaignProductLocation>();
 
     public CoopDbContext(DbContextOptions<CoopDbContext> options) : base(options)
-    {            
+    {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

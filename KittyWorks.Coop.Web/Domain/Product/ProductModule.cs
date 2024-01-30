@@ -1,4 +1,4 @@
-﻿namespace KittyWorks.Coop.Web.Domain;
+﻿namespace KittyWorks.Coop.Web.Domain.Product;
 
 public static class ProductModule
 {

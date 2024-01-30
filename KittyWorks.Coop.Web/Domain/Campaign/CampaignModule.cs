@@ -1,6 +1,8 @@
-﻿namespace KittyWorks.Coop.Web.Domain;
+﻿using KittyWorks.Coop.Web.Domain.Location;
 
-public static class CampaignModule
+namespace KittyWorks.Coop.Web.Domain.Campaign;
+
+public static partial class CampaignModule
 {
     public record CampaignDto
     {
@@ -9,18 +11,6 @@ public static class CampaignModule
         public required Guid ProductId { get; init; }
         public required Guid LocationId { get; init; }
         public required decimal Offer { get; init; }
-    }
-
-
-    public interface IAddCampaignContext
-        : ICreateCampaignFromDtoContext
-        , ICreateCampaignProductFromDtoContext
-        , ICreateCampaignProductLocationFromDtoContext
-    {
-        Action Commit { get; }
-        Func<string, Campaign?> GetCampaignByExternalId { get; }
-        Func<Guid, Guid, CampaignProduct?> GetCampaignProductByCampaignIdAndProductId { get; }
-        Func<Guid, Guid, CampaignProductLocation?> GetCampaignProductLocationByCampaignProductIdAndLocationId { get; }
     }
 
     public static void AddCampaign(IAddCampaignContext context, CampaignDto dto)
@@ -57,12 +47,6 @@ public static class CampaignModule
         context.Commit();
     }
 
-
-    public interface ICreateCampaignFromDtoContext
-    {
-        Action<Campaign> AddCampaign { get; }
-    }
-
     public static Campaign CreateCampaignFromDto(ICreateCampaignFromDtoContext context, CampaignDto dto)
     {
         var campaign = new Campaign
@@ -73,12 +57,6 @@ public static class CampaignModule
         context.AddCampaign(campaign);
 
         return campaign;
-    }
-
-
-    public interface ICreateCampaignProductFromDtoContext
-    {
-        Action<CampaignProduct> AddCampaignProduct { get; }
     }
 
     public static CampaignProduct CreateCampaignProductFromDto(ICreateCampaignProductFromDtoContext context, Guid campaignId, CampaignDto dto)
@@ -94,12 +72,6 @@ public static class CampaignModule
         return campaignProduct;
     }
 
-
-    public interface ICreateCampaignProductLocationFromDtoContext
-    {
-        Action<CampaignProductLocation> AddCampaignProductLocation { get; }
-    }
-
     public static CampaignProductLocation CreateCampaignProductLocationFromDto(ICreateCampaignProductLocationFromDtoContext context, Guid campaignProductId, CampaignDto dto)
     {
         var campaignProductLocation = new CampaignProductLocation
@@ -112,26 +84,10 @@ public static class CampaignModule
         return campaignProductLocation;
     }
 
-
-    public interface IDeleteCampaignContext
-    {
-        Action Commit { get; }
-        Action<Guid> DeleteCampaignWithCampaignProductsAndCampaignProductLocations { get; }
-    }
-
     public static void DeleteCampaign(IDeleteCampaignContext context, Guid campaignId)
     {
         context.DeleteCampaignWithCampaignProductsAndCampaignProductLocations(campaignId);
         context.Commit();
-    }
-
-
-    public interface IDeleteCampaignProductContext
-    {
-        Action Commit { get; }
-        Func<Guid, (CampaignProduct, Campaign)> GetCampaignProductWithCampaign { get; }
-        Action<Guid> DeleteCampaignProductWithCampaignProductLocations { get; }
-        Action<Guid> DeleteCampaignIfNoCampaignProducts { get; }
     }
 
     public static void DeleteCampaignProduct(IDeleteCampaignProductContext context, Guid campaignProductId)
@@ -143,16 +99,6 @@ public static class CampaignModule
 
         context.DeleteCampaignIfNoCampaignProducts(campaign.Id);
         context.Commit();
-    }
-
-
-    public interface IDeleteCampaignProductLocationContext
-    {
-        Action Commit { get; }
-        Func<Guid, (CampaignProductLocation, CampaignProduct, Campaign)> GetCampaignProductLocationWithCampaingProductAndCampaign { get; }
-        Action<Guid> DeleteCampaignProductLocation { get; }
-        Action<Guid> DeleteCampaignProductIfNoCampaignProductLocations { get; }
-        Action<Guid> DeleteCampaignIfNoCampaignProducts { get; }
     }
 
     public static void DeleteCampaignProductLocation(IDeleteCampaignProductLocationContext context, Guid campaignProductLocationId)
@@ -169,15 +115,6 @@ public static class CampaignModule
         context.Commit();
     }
 
-
-    public interface IDeleteProductWithRelatedCampaignProducts
-        : ProductModule.IDeleteProductContext
-    {
-        Func<Guid, List<Guid>> GetCampaignIdsByProductId { get; }
-        Action<Guid> DeleteCampaignProductsWithChildrenByProductId { get; }
-        Action<List<Guid>> DeleteCampaignsIfNoCampaignProductsByIds { get; }
-    }
-
     public static void DeleteProductWithRelatedCampaignProducts(IDeleteProductWithRelatedCampaignProducts context, Guid productId)
     {
         var campaignIds = context.GetCampaignIdsByProductId(productId);
@@ -188,19 +125,9 @@ public static class CampaignModule
         context.DeleteCampaignsIfNoCampaignProductsByIds(campaignIds);
         context.Commit();
 
-        ProductModule.DeleteProduct(context, productId);            
+        Product.ProductModule.DeleteProduct(context, productId);
     }
 
-
-    public interface IDeleteLocationWithRelatedCampaignProductLocations
-        : LocationModule.IDeleteLocationContext
-    {
-        Action<Guid> DeleteCampaignProductLocationsByLocationId { get; }
-        Func<Guid, List<(Guid CampaignProductId, Guid CampaignId)>> GetCampaignProductIdsWithCampaignIdsByLocationId { get; }
-        Action<List<Guid>> DeleteCampaignProductsIfNoCampaignProductLocationsByIds { get; }
-        Action<List<Guid>> DeleteCampaignsIfNoCampaignProductsByIds { get; }
-    }
-    
     public static void DeleteLocationsWithRelatedCampaignProductLocations(IDeleteLocationWithRelatedCampaignProductLocations context, Guid locationId)
     {
         var campaignProductIdsWithCampaignIds = context.GetCampaignProductIdsWithCampaignIdsByLocationId(locationId);

@@ -1,4 +1,4 @@
-﻿namespace KittyWorks.Coop.Web.Domain;
+﻿namespace KittyWorks.Coop.Web.Domain.Location;
 
 public static class LocationModule
 {

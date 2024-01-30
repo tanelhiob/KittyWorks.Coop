@@ -1,6 +1,6 @@
-﻿namespace KittyWorks.Coop.Web.Domain;
+﻿namespace KittyWorks.Coop.Web.Domain.Campaign;
 
-public class Campaign : Entity
+public record class Campaign : Entity
 {
     public required string Name { get; set; }
     public required string ExternalId { get; set; }

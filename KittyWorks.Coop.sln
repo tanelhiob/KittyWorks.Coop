@@ -5,7 +5,17 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "KittyWorks.Coop.CLI", "KittyWorks.Coop.CLI\KittyWorks.Coop.CLI.fsproj", "{1DA63B5D-38E7-4DED-8967-9465EE2953BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KittyWorks.Coop.Web", "KittyWorks.Coop.Web\KittyWorks.Coop.Web.csproj", "{0C20687F-BBFB-4F88-902C-E78B9B8083AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KittyWorks.Coop.Web", "KittyWorks.Coop.Web\KittyWorks.Coop.Web.csproj", "{0C20687F-BBFB-4F88-902C-E78B9B8083AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{D153C7B6-583F-477C-B899-DE8EF9489F73}"
+	ProjectSection(SolutionItems) = preProject
+		GroupCampaigns.fsx = GroupCampaigns.fsx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6439FE7B-24F3-4702-943D-9348FABCC95C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

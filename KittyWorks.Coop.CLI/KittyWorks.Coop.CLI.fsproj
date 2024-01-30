@@ -7,10 +7,10 @@
 
   <ItemGroup>
     <Compile Include="Core\Utilities.fs" />
+    <Compile Include="Domain\RelexPromo.fs" />
     <Compile Include="Domain\Product.fs" />
     <Compile Include="Domain\Location.fs" />
-    <Compile Include="Domain\Campaign\Campaign.fs" />
-    <Compile Include="Domain\Campaign\RelexPromo.fs" />
+    <Compile Include="Domain\Campaign.fs" />
     <Compile Include="Data\Db.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
